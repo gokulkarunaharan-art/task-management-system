@@ -10,7 +10,7 @@ import org.springframework.web.filter.CorsFilter;
 import java.util.List;
 
 @Configuration
-public class CORSconfig {
+public class CorsConfig {
     public static final String FRONTEND_URL = "http://localhost:5173";
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

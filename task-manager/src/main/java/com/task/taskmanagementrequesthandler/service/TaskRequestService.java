@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,5 +30,21 @@ public class TaskRequestService {
                 .uri("/task")
                 .retrieve()
                 .body(new  ParameterizedTypeReference<List<TaskDTO>>() {});
+    }
+
+    public TaskDTO updateTask(UUID id, TaskDTO taskDTO) {
+        return restClient.patch()
+                .uri("/task/{id}", id)
+                .body(taskDTO)
+                .retrieve()
+                .body(TaskDTO.class);
+    }
+
+    public void deleteTask(UUID id) {
+        restClient
+                .delete()
+                .uri("/task/{id}", id)
+                .retrieve()
+                .toBodilessEntity();
     }
 }

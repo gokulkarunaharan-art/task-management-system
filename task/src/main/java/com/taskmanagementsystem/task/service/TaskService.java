@@ -8,6 +8,8 @@ import com.taskmanagementsystem.task.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class TaskService {
@@ -19,5 +21,9 @@ public class TaskService {
         Task newTask = taskMapper.toEntity(taskDTO);
         newTask.setStatus(TaskStatus.PENDING);
         return taskMapper.toDTO(taskRepository.save(newTask));
+    }
+
+    public List<TaskDTO> getAllTasks() {
+        return taskRepository.findAll().stream().map(taskMapper::toDTO).toList();
     }
 }

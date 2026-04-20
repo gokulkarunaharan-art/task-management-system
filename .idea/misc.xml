@@ -8,6 +8,7 @@
         <option value="$PROJECT_DIR$/task-management-request-handler/pom.xml" />
         <option value="$PROJECT_DIR$/task-manager/pom.xml" />
         <option value="$PROJECT_DIR$/task/pom.xml" />
+        <option value="$PROJECT_DIR$/auth-server/pom.xml" />
       </list>
     </option>
   </component>

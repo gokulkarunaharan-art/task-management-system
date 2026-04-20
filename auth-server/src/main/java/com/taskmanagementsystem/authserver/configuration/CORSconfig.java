@@ -11,10 +11,11 @@ import java.util.List;
 
 @Configuration
 public class CORSconfig {
+    public static final String FRONTEND_URL = "http://localhost:5173";
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedOrigins(List.of(FRONTEND_URL));
         config.setAllowedMethods(List.of("*"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

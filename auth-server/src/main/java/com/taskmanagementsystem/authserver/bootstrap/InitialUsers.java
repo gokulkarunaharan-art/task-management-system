@@ -15,18 +15,17 @@ public class InitialUsers implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args){
         addSuperAdmin();
     }
 
     public void addSuperAdmin() {
-        if (! userRepository.findByUsername("superadmin").isPresent()) {
+        if (userRepository.findByUsername("superadmin").isEmpty()) {
             User superAdmin = User.builder()
                     .username("superadmin")
                     .password(passwordEncoder.encode("superadmin"))
                     .roles("ROLE_SUPER_ADMIN")
                     .build();
-
             userRepository.save(superAdmin);
         }
     }

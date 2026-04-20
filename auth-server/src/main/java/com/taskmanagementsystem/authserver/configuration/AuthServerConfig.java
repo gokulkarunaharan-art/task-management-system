@@ -11,13 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
-import org.springframework.security.oauth2.core.oidc.OidcScopes;
-import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
-import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -27,8 +20,9 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static com.taskmanagementsystem.authserver.controller.UserController.USER_ENDPOINT;
 
 
 @Configuration
@@ -58,10 +52,10 @@ public class AuthServerConfig {
     @Order(2)
     public SecurityFilterChain userApiSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/register")
+                .securityMatcher(USER_ENDPOINT)
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register").hasAuthority("ROLE_SUPER_ADMIN")
+                        .requestMatchers(USER_ENDPOINT).hasAuthority("ROLE_SUPER_ADMIN")
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -90,32 +84,7 @@ public class AuthServerConfig {
         return jwtConverter;
     }
 
-    @Bean
-    public RegisteredClientRepository registeredClientRepository() {
-        RegisteredClient Client = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("sample-client")
-                .clientSecret("{noop}secret")
-                .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUri("http://localhost:5173/")
-                .postLogoutRedirectUri("http://localhost:5173/")
-                .scope(OidcScopes.OPENID)
-                .scope(OidcScopes.PROFILE)
-                .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true)
-                        .requireProofKey(true).build())
-                .build();
 
-        RegisteredClient taskManagerServiceClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("task-manager-service")
-                .clientSecret("{noop}task-manager-secret")
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-                .scope("task:internal")
-                .build();
-
-        return new InMemoryRegisteredClientRepository(Client, taskManagerServiceClient);
-    }
 
     @Bean
     public OAuth2TokenCustomizer<JwtEncodingContext> tokenCustomizer() {

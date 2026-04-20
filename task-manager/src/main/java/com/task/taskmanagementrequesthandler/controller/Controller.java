@@ -15,24 +15,26 @@ import java.util.UUID;
 public class Controller {
 
     private final TaskRequestService service;
+    public static final String TASK_ENDPOINT = "/task";
+    public static final String TASK_ENDPOINT_ID = TASK_ENDPOINT + "/id";
 
-    @PostMapping("/task")
+    @PostMapping(TASK_ENDPOINT)
     public TaskDTO addTask(@RequestBody TaskDTO taskDTO){
             return service.addTask(taskDTO);
     }
 
-    @GetMapping("/task")
+    @GetMapping(TASK_ENDPOINT)
     public List<TaskDTO> getAllTasks(){
         return service.getAllTasks();
     }
 
-    @PatchMapping("/task/{id}")
+    @PatchMapping(TASK_ENDPOINT_ID)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public TaskDTO updateTask(@PathVariable UUID id, @RequestBody TaskDTO taskDTO) {
         return service.updateTask(id, taskDTO);
     }
 
-    @DeleteMapping("/task/{id}")
+    @DeleteMapping(TASK_ENDPOINT_ID)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTask(@PathVariable UUID id) {

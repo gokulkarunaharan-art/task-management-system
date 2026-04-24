@@ -2,6 +2,7 @@ package com.task.taskmanagementrequesthandler.controller;
 
 import com.task.taskmanagementrequesthandler.service.TaskRequestService;
 import com.taskmanagementsystem.shared.TaskDTO;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,7 +20,7 @@ public class Controller {
     public static final String TASK_ENDPOINT_ID = TASK_ENDPOINT + "/{id}";
 
     @PostMapping(TASK_ENDPOINT)
-    public TaskDTO addTask(@RequestBody TaskDTO taskDTO){
+    public TaskDTO addTask(@Valid @RequestBody TaskDTO taskDTO){
             return service.addTask(taskDTO);
     }
 
@@ -30,7 +31,7 @@ public class Controller {
 
     @PatchMapping(TASK_ENDPOINT_ID)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public TaskDTO updateTask(@PathVariable UUID id, @RequestBody TaskDTO taskDTO) {
+    public TaskDTO updateTask(@PathVariable UUID id,@Valid @RequestBody TaskDTO taskDTO) {
         return service.updateTask(id, taskDTO);
     }
 

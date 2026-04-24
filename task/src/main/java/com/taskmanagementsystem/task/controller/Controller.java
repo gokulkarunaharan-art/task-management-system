@@ -14,7 +14,7 @@ public class Controller {
 
     private final TaskService service;
     public static final String TASK_ENDPOINT = "/task";
-    public static final String TASK_ENDPOINT_ID = TASK_ENDPOINT + "/id";
+    public static final String TASK_ENDPOINT_ID = TASK_ENDPOINT + "/{id}";
 
     @PostMapping(TASK_ENDPOINT)
     public TaskDTO addTask(@RequestBody TaskDTO taskDTO){
@@ -22,11 +22,11 @@ public class Controller {
     }
 
     @GetMapping(TASK_ENDPOINT)
-    public List<TaskDTO> getTask(){
+    public List<TaskDTO> getTask() {
         return service.getAllTasks();
     }
 
-    @PatchMapping(TASK_ENDPOINT_ID)
+    @PutMapping(TASK_ENDPOINT_ID)
     public TaskDTO updateTask(@PathVariable UUID id, @RequestBody TaskDTO taskDTO) {
         return service.updateTaskById(id, taskDTO);
     }
@@ -36,5 +36,3 @@ public class Controller {
         service.deleteTask(id);
     }
 }
-
-

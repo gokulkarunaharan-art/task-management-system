@@ -1,11 +1,13 @@
 package com.taskmanagementsystem.authserver.configuration;
 
+import com.taskmanagementsystem.authserver.model.User;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.authorization.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -53,7 +55,7 @@ public class AuthServerConfig {
     public SecurityFilterChain userApiSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher(USER_ENDPOINT)
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(USER_ENDPOINT).hasAuthority("ROLE_SUPER_ADMIN")
                         .anyRequest().authenticated()
@@ -73,36 +75,33 @@ public class AuthServerConfig {
         return http.build();
     }
 
-
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter converter = new JwtGrantedAuthoritiesConverter();
-        converter.setAuthoritiesClaimName("roles");  // your custom claim
-        converter.setAuthorityPrefix("");             // already has ROLE_ prefix
+        converter.setAuthoritiesClaimName("roles");
+        converter.setAuthorityPrefix("");
         JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
         jwtConverter.setJwtGrantedAuthoritiesConverter(converter);
         return jwtConverter;
     }
-
-
 
     @Bean
     public OAuth2TokenCustomizer<JwtEncodingContext> tokenCustomizer() {
         return context -> {
             Authentication principal = context.getPrincipal();
             if (context.getTokenType().getValue().equals("access_token")) {
+                User user = (User) principal.getPrincipal();
                 Set<String> authorities = principal.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
                         .collect(Collectors.toSet());
-                context.getClaims().claim("roles", authorities);
+                context.getClaims().claim("roles", authorities.stream().filter(authority->authority.startsWith("ROLE_")).collect(Collectors.toSet()));
+                context.getClaims().claim("email",user.getEmail());
             }
         };
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // This returns the DelegatingPasswordEncoder.
-        // It supports {bcrypt}, {noop}, {pbkdf2}, etc.
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 

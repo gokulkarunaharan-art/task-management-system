@@ -16,7 +16,7 @@ public class Controller {
 
     private final TaskRequestService service;
     public static final String TASK_ENDPOINT = "/task";
-    public static final String TASK_ENDPOINT_ID = TASK_ENDPOINT + "/id";
+    public static final String TASK_ENDPOINT_ID = TASK_ENDPOINT + "/{id}";
 
     @PostMapping(TASK_ENDPOINT)
     public TaskDTO addTask(@RequestBody TaskDTO taskDTO){

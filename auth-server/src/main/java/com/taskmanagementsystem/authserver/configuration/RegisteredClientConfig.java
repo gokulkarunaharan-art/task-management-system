@@ -30,14 +30,6 @@ public class RegisteredClientConfig {
                         .requireProofKey(true).build())
                 .build();
 
-        RegisteredClient taskManagerServiceClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("task-manager-service")
-                .clientSecret("{noop}task-manager-secret")
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-                .scope("task:internal")
-                .build();
-
-        return new InMemoryRegisteredClientRepository(Client, taskManagerServiceClient);
+        return new InMemoryRegisteredClientRepository(Client);
     }
 }

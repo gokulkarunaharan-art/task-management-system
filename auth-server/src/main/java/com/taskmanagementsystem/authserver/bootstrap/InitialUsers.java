@@ -24,6 +24,7 @@ public class InitialUsers implements CommandLineRunner {
             User superAdmin = User.builder()
                     .username("superadmin")
                     .password(passwordEncoder.encode("superadmin"))
+                    .email("gokulkarunaharan41@gmail.com")
                     .roles("ROLE_SUPER_ADMIN")
                     .build();
             userRepository.save(superAdmin);

@@ -3,14 +3,12 @@ package com.task.taskmanagementrequesthandler.configuration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
-import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.client.RestClient;
+
+import java.util.stream.Collectors;
 
 @Configuration
 public class RestClientConfig {
@@ -18,33 +16,36 @@ public class RestClientConfig {
     @Value("${task.service.url}")
     private String baseUrl;
 
-    @Bean
-    public OAuth2AuthorizedClientManager authorizedClientManager(
-            ClientRegistrationRepository clientRegistrationRepository,
-            OAuth2AuthorizedClientRepository authorizedClientRepository) {
+    @Value("${task.service.username}")
+    private String username;
 
-        OAuth2AuthorizedClientProvider authorizedClientProvider =
-                OAuth2AuthorizedClientProviderBuilder.builder()
-                        .clientCredentials()
-                        .build();
-
-        DefaultOAuth2AuthorizedClientManager authorizedClientManager =
-                new DefaultOAuth2AuthorizedClientManager(
-                        clientRegistrationRepository, authorizedClientRepository);
-        authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
-
-        return authorizedClientManager;
-    }
+    @Value("${task.service.password}")
+    private String password;
 
     @Bean
-    public RestClient restClient(OAuth2AuthorizedClientManager authorizedClientManager){
-        OAuth2ClientHttpRequestInterceptor interceptor = new OAuth2ClientHttpRequestInterceptor(authorizedClientManager);
-
-        interceptor.setClientRegistrationIdResolver(request -> "task-service-client");
+    public RestClient restClient(){
 
         return RestClient.builder()
+                .defaultHeaders(headers->headers.setBasicAuth(username, password))
+                .requestInterceptor((request, body, execution) -> {
+
+                    JwtAuthenticationToken auth =
+                            (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+                    if (auth != null) {
+                        Jwt jwt = auth.getToken();
+
+                        request.getHeaders().set("X-Auth-Username", jwt.getClaimAsString("sub"));
+                        request.getHeaders().set("X-Auth-Email",    jwt.getClaimAsString("email"));
+                        request.getHeaders().set("X-Auth-Role",    jwt.getClaimAsStringList("roles")
+                                .stream()
+                                .filter(role -> role.startsWith("ROLE_"))
+                                .collect(Collectors.joining(",")));
+                    }
+                    System.out.println("Request sent to URI: " + request.getURI());
+                    System.out.println("Headers: " + request.getHeaders());
+                    return execution.execute(request, body);
+                })
                 .baseUrl(baseUrl)
-                .requestInterceptor(interceptor)
                 .build();
     }
 }

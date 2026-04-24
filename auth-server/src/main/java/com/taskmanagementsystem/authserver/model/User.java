@@ -1,9 +1,7 @@
 package com.taskmanagementsystem.authserver.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,6 +16,8 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Table(name = "users_table")
 public class User implements UserDetails {
     @Id
@@ -25,6 +25,7 @@ public class User implements UserDetails {
     private UUID id;
     private String username;
     private String password;
+    private String email;
     private String roles;
 
 

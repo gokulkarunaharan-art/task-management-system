@@ -1,6 +1,7 @@
 package com.taskmanagementsystem.authserver.service;
 
 import com.taskmanagementsystem.authserver.dto.UserDTO;
+import com.taskmanagementsystem.authserver.exception.OperationNotAllowedException;
 import com.taskmanagementsystem.authserver.model.User;
 import com.taskmanagementsystem.authserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +25,15 @@ public class UserService {
         userRepository.save(User.builder()
                 .username(userDTO.getUsername())
                 .password(passwordEncoder.encode(userDTO.getPassword()))
+                .email(userDTO.getEmail())
                 .roles(userDTO.getRoles())
                 .build());
     }
 
     public void deleteUser(UserDTO userDTO) {
+        if(SecurityContextHolder.getContext().getAuthentication().getName().equals(userDTO.getUsername())){
+            throw new OperationNotAllowedException("cannot delete the current logged in user");
+        }
         Optional<User> user = userRepository.findByUsername(userDTO.getUsername());
         if(user.isEmpty()){
             throw new RuntimeException("Username doesn't exist: " + userDTO.getUsername());

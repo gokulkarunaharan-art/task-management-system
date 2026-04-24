@@ -33,7 +33,7 @@ public class TaskRequestService {
     }
 
     public TaskDTO updateTask(UUID id, TaskDTO taskDTO) {
-        return restClient.patch()
+        return restClient.put()
                 .uri("/task/{id}", id)
                 .body(taskDTO)
                 .retrieve()

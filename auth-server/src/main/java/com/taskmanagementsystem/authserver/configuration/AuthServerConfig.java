@@ -41,7 +41,6 @@ public class AuthServerConfig {
                         configurer.oidc(Customizer.withDefaults())
                 )
                 .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
-                .sessionManagement(AbstractHttpConfigurer::disable)
                 .exceptionHandling(e -> e
                         .defaultAuthenticationEntryPointFor(
                                 new LoginUrlAuthenticationEntryPoint("/login"),
@@ -72,7 +71,11 @@ public class AuthServerConfig {
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
-                .formLogin(Customizer.withDefaults());
+                .formLogin(Customizer.withDefaults())
+                .logout(logout->{
+                    logout.logoutSuccessUrl("http://localhost:5173")
+                            .permitAll();
+                });
         return http.build();
     }
 

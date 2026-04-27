@@ -1225,12 +1225,19 @@ export default function App() {
 
   // ── Logout ───────────────────────────────────────────────────
   const handleLogout = useCallback(() => {
+    // Clear all client-side authentication data first
     sessionStorage.removeItem("_tms_at");
     sessionStorage.removeItem("_tms_verifier");
     sessionStorage.removeItem("_tms_state");
     setToken(null);
     setClaims(null);
     setPage("tasks");
+    setAuthError(null);
+    
+    // Redirect to auth server logout endpoint
+    // This invalidates the server-side session and clears JSESSIONID cookie
+    // Then redirects back to the login page
+    window.location.href = `${AUTH_URL}/logout`;
   }, []);
 
   // ── Role display ─────────────────────────────────────────────
@@ -1327,3 +1334,4 @@ export default function App() {
       </>
   );
 }
+

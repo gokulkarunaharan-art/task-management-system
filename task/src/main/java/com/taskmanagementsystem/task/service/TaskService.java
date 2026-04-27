@@ -40,14 +40,17 @@ public class TaskService {
         return taskRepository.findAll().stream().map(taskMapper::toDTO).toList();
     }
 
-    public TaskDTO updateTaskById(UUID id, TaskDTO taskDTO){
-        Task existingTask = taskRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Task not found: " + id));
-        Task updatedTask = taskMapper.updateEntityFromDto(taskDTO,existingTask);
-        taskRepository.save(updatedTask);
 
-        eventPublisher.publishEvent(new TaskUpdatedEvent(existingTask, updatedTask, userContext));
-        return taskMapper.toDTO(updatedTask);
+    public TaskDTO updateTaskById(UUID id, TaskDTO taskDTO){
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Task not found: " + id));
+
+        Task oldTask = taskMapper.copy(task);
+        taskMapper.updateEntityFromDto(taskDTO,task);
+        taskRepository.save(task);
+
+        eventPublisher.publishEvent(new TaskUpdatedEvent(oldTask, task, userContext));
+        return taskMapper.toDTO(task);
     }
 
     public void deleteTask(UUID id) {

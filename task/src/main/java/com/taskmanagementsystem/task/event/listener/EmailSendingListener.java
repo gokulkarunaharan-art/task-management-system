@@ -8,6 +8,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
+
+import static com.taskmanagementsystem.task.template.EmailTemplate.*;
 
 
 @RequiredArgsConstructor
@@ -18,25 +23,43 @@ public class EmailSendingListener {
 
     @EventListener
     @Async
-    public void handleTaskCreatedEvent(TaskCreatedEvent taskCreatedEvent) {
-        String subject = "Task Created By "+taskCreatedEvent.getUserContext().getUsername();
-        String body = "Task \""+taskCreatedEvent.getCreatedTask().getTaskName()+"\" has been created by "+taskCreatedEvent.getUserContext().getUsername()+"("+taskCreatedEvent.getUserContext().getRole()+")";
-        emailService.sendMail(subject,body);
+    public void handleTaskCreatedEvent(TaskCreatedEvent event) {
+        emailService.sendMail(
+                TASK_CREATED_SUBJECT.formatted(event.getCreatedTask().getTaskName()),
+                TASK_CREATED_BODY.formatted(
+                        event.getCreatedTask().getTaskName(),
+                        event.getUserContext().getUsername(),
+                        event.getUserContext().getRole()
+                ));
     }
 
     @EventListener
     @Async
-    public void handleTaskDeletedEvent(TaskDeletedEvent taskDeletedEvent) {
-        String subject = "Task Deleted By "+taskDeletedEvent.getUserContext().getUsername();
-        String body = "Task \""+taskDeletedEvent.getDeletedTask().getTaskName()+"\" has been deleted by "+taskDeletedEvent.getUserContext().getUsername()+"("+taskDeletedEvent.getUserContext().getRole()+")";
-        emailService.sendMail(subject,body);
+    public void handleTaskDeletedEvent(TaskDeletedEvent event) {
+        emailService.sendMail(
+                TASK_DELETED_SUBJECT.formatted(event.getDeletedTask().getTaskName()),
+                TASK_DELETED_BODY.formatted(
+                        event.getDeletedTask().getTaskName(),
+                        event.getUserContext().getUsername(),
+                        event.getUserContext().getRole()
+                ));
     }
 
     @EventListener
     @Async
-    public void handleTaskUpdatedEvent(TaskUpdatedEvent taskUpdatedEvent) {
-        String subject = "Task Updated By "+taskUpdatedEvent.getUserContext().getUsername();
-        String body = "Task \""+taskUpdatedEvent.getOldTask().getTaskName()+"\" has been updated by "+taskUpdatedEvent.getUserContext().getUsername()+"("+taskUpdatedEvent.getUserContext().getRole()+")";
-        emailService.sendMail(subject,body);
+    public void handleTaskUpdatedEvent(TaskUpdatedEvent event) {
+        emailService.sendMail(TASK_UPDATED_SUBJECT.formatted(event.getOldTask().getTaskName()),
+                TASK_UPDATED_BODY.formatted(
+                        event.getOldTask().getTaskName(),
+                        event.getOldTask().getTaskDescription(),
+                        event.getOldTask().getStatus(),
+
+                        event.getNewTask().getTaskName(),
+                        event.getNewTask().getTaskDescription(),
+                        event.getNewTask().getStatus(),
+
+                        event.getUserContext().getUsername(),
+                        event.getUserContext().getRole()
+                ));
     }
 }

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class EmailService {
 
     private final JavaMailSender mailSender;
-    private static final String SENDER = "gokulkarunaharan41@gmail.com";
+    private static final String SENDER = "notification.taskmanagement@gmail.com";
     private static final String SUPER_ADMIN_EMAIL="flareoplane@gmail.com";
 
     public void sendMail(String subject, String text) {

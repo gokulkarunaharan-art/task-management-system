@@ -2,6 +2,7 @@ package com.taskmanagementsystem.authserver.controller;
 
 import com.taskmanagementsystem.authserver.dto.UserDTO;
 import com.taskmanagementsystem.authserver.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +14,7 @@ public class UserController {
     public static final String USER_ENDPOINT = "/user";
 
     @PostMapping(USER_ENDPOINT)
-    public void registerUser(@RequestBody UserDTO userDTO) {
+    public void registerUser(@RequestBody @Valid UserDTO userDTO) {
         userService.createUser(userDTO);
     }
 

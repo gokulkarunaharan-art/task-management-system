@@ -2,6 +2,7 @@ package com.taskmanagementsystem.authserver.service;
 
 import com.taskmanagementsystem.authserver.dto.UserDTO;
 import com.taskmanagementsystem.authserver.exception.OperationNotAllowedException;
+import com.taskmanagementsystem.authserver.model.Role;
 import com.taskmanagementsystem.authserver.model.User;
 import com.taskmanagementsystem.authserver.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +23,16 @@ public class UserService {
         userRepository.findByUsername(userDTO.getUsername()).ifPresent(user -> {
             throw new RuntimeException("Username already exists: " + userDTO.getUsername());
         });
+
+        if(userDTO.getRoles().equals(Role.ROLE_SUPER_ADMIN)) {
+            throw new OperationNotAllowedException("Cannot create user with role: " + Role.ROLE_SUPER_ADMIN);
+        }
+
         userRepository.save(User.builder()
                 .username(userDTO.getUsername())
                 .password(passwordEncoder.encode(userDTO.getPassword()))
                 .email(userDTO.getEmail())
-                .roles(userDTO.getRoles())
+                .roles(userDTO.getRoles().name())
                 .build());
     }
 

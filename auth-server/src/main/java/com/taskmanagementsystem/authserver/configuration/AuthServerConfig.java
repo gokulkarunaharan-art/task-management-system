@@ -20,6 +20,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
+import org.springframework.util.AntPathMatcher;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -72,10 +73,7 @@ public class AuthServerConfig {
         http
                 .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
                 .formLogin(Customizer.withDefaults())
-                .logout(logout->{
-                    logout.logoutSuccessUrl("http://localhost:5173")
-                            .permitAll();
-                });
+                .logout(logout->logout.logoutSuccessUrl("http://localhost:5173/"));
         return http.build();
     }
 

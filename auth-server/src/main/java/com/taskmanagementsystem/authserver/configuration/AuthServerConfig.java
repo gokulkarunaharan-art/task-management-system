@@ -41,6 +41,7 @@ public class AuthServerConfig {
                         configurer.oidc(Customizer.withDefaults())
                 )
                 .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .sessionManagement(AbstractHttpConfigurer::disable)
                 .exceptionHandling(e -> e
                         .defaultAuthenticationEntryPointFor(
                                 new LoginUrlAuthenticationEntryPoint("/login"),
